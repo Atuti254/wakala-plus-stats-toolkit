@@ -256,9 +256,28 @@ def compare_with_numpy(analyzer: StatisticsAnalyzer, tol: float = 1e-6) -> tuple
 
     return matches, "\n".join(report_lines)
 
+# Quick snippet to analyze by town
+import csv
+from collections import defaultdict
+
+town_data = defaultdict(list)
+with open("data/agent_deposits.csv", mode="r") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        try:
+            val = float(row["daily_deposits_kes"])
+            town_data[row["town"]].append(val)
+        except (ValueError, TypeError):
+            continue
+
+for town, values in town_data.items():
+    analyzer = StatisticsAnalyzer(values, name=f"Town_{town}")
+    print(f"--- {town} Summary ---")
+    print(f"Mean: {analyzer.summary()['mean']:.2f}")
 
 if __name__ == "__main__":
     if DATA_PATH.exists():
+        # Overall analysis
         analyzer = StatisticsAnalyzer.from_csv(DATA_PATH, "daily_deposits_kes")
         report_text = analyzer.report()
         _, numpy_text = compare_with_numpy(analyzer)
@@ -269,3 +288,23 @@ if __name__ == "__main__":
         out_dir = Path("output")
         out_dir.mkdir(exist_ok=True)
         (out_dir / "stats_report.txt").write_text(full_output, encoding="utf-8")
+
+        # Analysis grouped by town
+        import csv
+        from collections import defaultdict
+
+        town_data = defaultdict(list)
+        with open(DATA_PATH, mode="r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                try:
+                    val = float(row["daily_deposits_kes"].replace(",", ""))
+                    town_data[row["town"]].append(val)
+                except (ValueError, TypeError, KeyError):
+                    continue
+
+        print("\n=== Town Breakdown ===")
+        for town, values in town_data.items():
+            town_analyzer = StatisticsAnalyzer(values, name=f"Town_{town}")
+            s = town_analyzer.summary()
+            print(f"{town:<12}: count={s['count']}, mean={s['mean']:.2f}, std_dev={s['std_dev']:.2f}")
