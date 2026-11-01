@@ -1,0 +1,35 @@
+=== Statistics report: daily_deposits_kes ===
+Rows read         : 40
+Valid values      : 35
+Rejected values   : 5
+  row 7: '' (missing value)
+  row 10: '-' (missing value)
+  row 14: 'n/a' (missing value)
+  row 25: '12,40O' (invalid numeric format)
+  row 29: '' (missing value)
+
+                     all data        outliers removed
+count                35              31             
+mean                 22400.00        18349.65       
+median               18805.47        18506.72       
+mode                 none            none           
+variance (sample)    328019873.36    10116378.52    
+std dev (sample)     18111.32        3180.63        
+min / max            1200.00 / 96500.00 12772.70 / 26725.69
+Q1 / Q3              15998.40 / 20977.21 15998.40 / 20730.60
+IQR                  4978.81         4732.20        
+
+Outlier fences      : lower 8530.19, upper 28445.41
+Outliers            : 1200.00, 29060.99, 88400.00, 96500.00
+
+Risk Team Note:
+Extremely high outliers likely indicate larger bulk deposits, business liquidity floats, or decimal entry errors.
+Extremely low outlier days may represent network downtimes, unrecorded offline transactions, or float exhaustion.
+Removing outliers stabilizes baseline expectations for routine agent monitoring.
+
+=== NumPy verification ===
+mean      MATCH
+median    MATCH
+variance  MATCH  (ddof=1)
+std dev   MATCH  (ddof=1)
+Q1 / Q3   MATCH  (method=linear)
